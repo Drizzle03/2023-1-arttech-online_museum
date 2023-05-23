@@ -1,23 +1,22 @@
-# 필요한 라이브러리를 불러옵니다.
 import tensorflow as tf
 import cv2
 import numpy as np
 from p5 import *
 import random
 
-# TensorFlow Lite 모델을 불러옵니다.
+# TensorFlow Lite 모델 load
 interpreter = tf.lite.Interpreter(model_path="quant_model.tflite")
 interpreter.allocate_tensors()
 
 input_details = interpreter.get_input_details()
 output_details = interpreter.get_output_details()
 
-# 웹캠을 불러옵니다.
+# 웹캠 load
 camera = cv2.VideoCapture(0)
 camera.set(3, 640)  # width
 camera.set(4, 480)  # height
 
-# 웹캠에서 이미지를 가져오는 함수입니다.
+# 웹캠 이미지 load
 def get_image():
     ret, frame = camera.read()
     frame = cv2.resize(frame, (224, 224))  # resize
@@ -33,7 +32,7 @@ class Circle:
         self.targetX = self.x
         self.targetY = self.y
         self.easing = 0.05
-        self.size = random.uniform(20, 80)  # 동그라미의 크기를 무작위로 설정
+        self.size = random.uniform(20, 80)  # 동그라미의 크기 랜덤 설정
 
     def move(self):
         dx = self.targetX - self.x
@@ -47,7 +46,6 @@ class Circle:
 circles = []
 circleCount = 20  # 동그라미 개수 설정
 status = 1
-
 
 def setup():
     size(1280, 720)
@@ -65,10 +63,8 @@ def draw():
         circle.move()
         circle.display()
 
-    # 이미지 로드
     image = get_image()
-
-    # 이미지를 모델의 입력 텐서에 설정
+    # 이미지 모델 입력 텐서 설정
     interpreter.set_tensor(input_details[0]['index'], image)
     # 모델 실행
     interpreter.invoke()
@@ -76,7 +72,8 @@ def draw():
     prediction = interpreter.get_tensor(output_details[0]['index'])
 
 
-    if np.argmax(prediction) == 0:  # 주먹일 경우
+    # 주먹 - 모임
+    if np.argmax(prediction) == 0: 
         if status == 1:
             status = 0
             targetX = width / 2
@@ -85,7 +82,8 @@ def draw():
                 circle.targetX = targetX
                 circle.targetY = targetY
 
-    elif np.argmax(prediction) == 1:  # 보자기일 경우
+    # 보자기 - 퍼짐
+    elif np.argmax(prediction) == 1:
         if status == 0:
             status = 1
             for circle in circles:
