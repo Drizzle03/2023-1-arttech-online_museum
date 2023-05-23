@@ -1,12 +1,16 @@
 # 필요한 라이브러리를 불러옵니다.
-from keras.models import load_model
+import tensorflow as tf
 import cv2
 import numpy as np
 from p5 import *
 import random
 
-# Keras 모델을 불러옵니다.
-model = load_model('keras_model.h5')
+# TensorFlow Lite 모델을 불러옵니다.
+interpreter = tf.lite.Interpreter(model_path="quant_model.tflite")
+interpreter.allocate_tensors()
+
+input_details = interpreter.get_input_details()
+output_details = interpreter.get_output_details()
 
 # 웹캠을 불러옵니다.
 camera = cv2.VideoCapture(0)
@@ -64,8 +68,12 @@ def draw():
     # 이미지 로드
     image = get_image()
 
+    # 이미지를 모델의 입력 텐서에 설정
+    interpreter.set_tensor(input_details[0]['index'], image)
+    # 모델 실행
+    interpreter.invoke()
     # 예측 결과 도출
-    prediction = model.predict(image)
+    prediction = interpreter.get_tensor(output_details[0]['index'])
 
 
     if np.argmax(prediction) == 0:  # 주먹일 경우
