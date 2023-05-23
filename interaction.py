@@ -1,6 +1,9 @@
 from p5 import *
 import random
 
+width = 1280
+height = 720
+
 class Circle:
     def __init__(self, x, y):
         self.x = x
@@ -8,7 +11,7 @@ class Circle:
         self.targetX = self.x
         self.targetY = self.y
         self.easing = 0.05
-        self.size = random.uniform(20, 80)  # 동그라미의 크기를 무작위로 설정
+        self.size = random.uniform(10, 50)  # 동그라미의 크기를 무작위로 설정
 
     def move(self):
         dx = self.targetX - self.x
@@ -17,13 +20,15 @@ class Circle:
         self.y += dy * self.easing
 
     def display(self):
+        fill(255)
         circle((self.x, self.y), self.size)
 
 circles = []
 circleCount = 20  # 동그라미 개수 설정
 
 def setup():
-    size(1280, 720)
+    size(width, height)
+    noStroke()
     for _ in range(circleCount):
         x = random.uniform(0, width)
         y = random.uniform(0, height)
@@ -31,7 +36,9 @@ def setup():
         circles.append(circle)
 
 def draw():
-    background(255)
+    fill(0, 10)
+    rect(0, 0, width, height)
+
     for circle in circles:
         circle.move()
         circle.display()

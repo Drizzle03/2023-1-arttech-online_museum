@@ -6,6 +6,9 @@ import random
 import threading
 import time
 
+width = 1280
+height = 720
+
 # TensorFlow Lite 모델 load
 interpreter = tf.lite.Interpreter(model_path="quant_model.tflite")
 interpreter.allocate_tensors()
@@ -76,7 +79,7 @@ class Circle:
         self.targetX = self.x
         self.targetY = self.y
         self.easing = 0.05
-        self.size = random.uniform(20, 80)  
+        self.size = random.uniform(10, 50)  
         # 동그라미 랜덤 크기 설정
 
     def move(self):
@@ -93,7 +96,8 @@ circleCount = 20  # 동그라미 개수 설정
 status = 1
 
 def setup():
-    size(1280, 720)
+    size(width, height)
+    noStroke()
     for _ in range(circleCount):
         x = random.uniform(0, width)
         y = random.uniform(0, height)
@@ -103,7 +107,9 @@ def setup():
 def draw():
     global circles, status
 
-    background(255)
+    fill(0, 10)
+    rect(0, 0, width, height)
+    
     for circle in circles:
         circle.move()
         circle.display()
