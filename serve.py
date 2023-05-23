@@ -89,6 +89,7 @@ class Circle:
         self.y += dy * self.easing
 
     def display(self):
+        fill(255)
         circle((self.x, self.y), self.size)
 
 circles = []
@@ -109,7 +110,7 @@ def draw():
 
     fill(0, 10)
     rect(0, 0, width, height)
-    
+
     for circle in circles:
         circle.move()
         circle.display()
