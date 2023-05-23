@@ -42,7 +42,7 @@ class Circle:
 
 circles = []
 circleCount = 20  # 동그라미 개수 설정
-
+status = 1
 
 
 def setup():
@@ -54,7 +54,8 @@ def setup():
         circles.append(circle)
 
 def draw():
-    global circles
+    global circles, status
+
     background(255)
     for circle in circles:
         circle.move()
@@ -66,16 +67,21 @@ def draw():
     # 예측 결과 도출
     prediction = model.predict(image)
 
+
     if np.argmax(prediction) == 0:  # 주먹일 경우
-        targetX = width / 2
-        targetY = height / 2
-        for circle in circles:
-            circle.targetX = targetX
-            circle.targetY = targetY
+        if status == 1:
+            status = 0
+            targetX = width / 2
+            targetY = height / 2
+            for circle in circles:
+                circle.targetX = targetX
+                circle.targetY = targetY
 
     elif np.argmax(prediction) == 1:  # 보자기일 경우
-        for circle in circles:
-            circle.targetX = random.uniform(0, width)
-            circle.targetY = random.uniform(0, height)
+        if status == 0:
+            status = 1
+            for circle in circles:
+                circle.targetX = random.uniform(0, width)
+                circle.targetY = random.uniform(0, height)
 
 run()
