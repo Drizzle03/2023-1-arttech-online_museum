@@ -3,6 +3,8 @@ import cv2
 import numpy as np
 from p5 import *
 import random
+import threading
+import time
 
 # TensorFlow Lite 모델 load
 interpreter = tf.lite.Interpreter(model_path="quant_model.tflite")
@@ -13,17 +15,59 @@ output_details = interpreter.get_output_details()
 
 # 웹캠 load
 camera = cv2.VideoCapture(0)
-camera.set(3, 640)  # width
-camera.set(4, 480)  # height
+camera.set(3, 224)  # width - 해상도 낮춤
+camera.set(4, 224)  # height - 해상도 낮춤
 
-# 웹캠 이미지 load
-def get_image():
-    ret, frame = camera.read()
-    frame = cv2.resize(frame, (224, 224))  # resize
-    frame = np.asarray(frame)  # to numpy array
-    frame = (frame.astype(np.float32) / 127.0) - 1  # normalize
-    frame = np.expand_dims(frame, axis=0)  # expand dimension
-    return frame
+class ImageGetter(threading.Thread):
+    def __init__(self):
+        super(ImageGetter, self).__init__()
+        self.image = None
+
+    def get_image(self):
+        return self.image
+
+    def run(self):
+        global camera
+        while True:
+            ret, frame = camera.read()
+            frame = cv2.resize(frame, (224, 224)) 
+            frame = np.asarray(frame)
+            frame = (frame.astype(np.float32) / 127.0) - 1 
+            frame = np.expand_dims(frame, axis=0) 
+            self.image = frame
+            time.sleep(0.01)  # CPU 부담을 줄이기 위해 적용
+
+class ModelInferencer(threading.Thread):
+    def __init__(self):
+        super(ModelInferencer, self).__init__()
+        self.prediction = None
+        self.image = None
+        self.new_prediction = False
+
+    def set_image(self, image):
+        self.image = image
+
+    def get_prediction(self):
+        self.new_prediction = False
+        return self.prediction
+
+    def run(self):
+        global interpreter, input_details, output_details
+        while True:
+            if self.image is not None:
+                interpreter.set_tensor(input_details[0]['index'], self.image)
+                interpreter.invoke()
+                self.prediction = interpreter.get_tensor(output_details[0]['index'])
+                self.new_prediction = True
+                self.image = None
+            time.sleep(0.01)  # CPU 부담을 줄이기 위해 적용
+
+image_getter = ImageGetter()
+image_getter.start()
+
+model_inferencer = ModelInferencer()
+model_inferencer.start()
+
 
 class Circle:
     def __init__(self, x, y):
@@ -32,7 +76,8 @@ class Circle:
         self.targetX = self.x
         self.targetY = self.y
         self.easing = 0.05
-        self.size = random.uniform(20, 80)  # 동그라미의 크기 랜덤 설정
+        self.size = random.uniform(20, 80)  
+        # 동그라미 랜덤 크기 설정
 
     def move(self):
         dx = self.targetX - self.x
@@ -63,31 +108,30 @@ def draw():
         circle.move()
         circle.display()
 
-    image = get_image()
-    # 이미지 모델 입력 텐서 설정
-    interpreter.set_tensor(input_details[0]['index'], image)
-    # 모델 실행
-    interpreter.invoke()
-    # 예측 결과 도출
-    prediction = interpreter.get_tensor(output_details[0]['index'])
+    image = image_getter.get_image()  # 웹캠 이미지 가져오기
+    if image is not None:
+        model_inferencer.set_image(image)
 
+    if model_inferencer.new_prediction:
+        prediction = model_inferencer.get_prediction()
 
-    # 주먹 - 모임
-    if np.argmax(prediction) == 0: 
-        if status == 1:
-            status = 0
-            targetX = width / 2
-            targetY = height / 2
-            for circle in circles:
-                circle.targetX = targetX
-                circle.targetY = targetY
+        # 주먹 - 모임
+        if np.argmax(prediction) == 0: 
+            if status == 1:
+                status = 0
+                targetX = width / 2
+                targetY = height / 2
+                for circle in circles:
+                    circle.targetX = targetX
+                    circle.targetY = targetY
 
-    # 보자기 - 퍼짐
-    elif np.argmax(prediction) == 1:
-        if status == 0:
-            status = 1
-            for circle in circles:
-                circle.targetX = random.uniform(0, width)
-                circle.targetY = random.uniform(0, height)
+        # 보자기 - 퍼짐
+        elif np.argmax(prediction) == 1:
+            if status == 0:
+                status = 1
+                for circle in circles:
+                    circle.targetX = random.uniform(0, width)
+                    circle.targetY = random.uniform(0, height)
 
 run()
+

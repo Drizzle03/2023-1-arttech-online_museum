@@ -4,7 +4,7 @@ import numpy as np
 from p5 import *
 import tensorflow as tf
 
-# TensorFlow Lite 모델을 불러옵니다.
+# TensorFlow Lite model load
 interpreter = tf.lite.Interpreter(model_path="quant_model.tflite")
 interpreter.allocate_tensors()
 
@@ -16,7 +16,7 @@ camera = cv2.VideoCapture(0)
 camera.set(3, 640)  # width
 camera.set(4, 480)  # height
 
-# 웹캠에서 이미지를 가져오는 함수입니다.
+# 웹캠 image load
 def get_image():
     ret, frame = camera.read()
     frame = cv2.resize(frame, (224, 224))  # resize
