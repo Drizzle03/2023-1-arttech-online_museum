@@ -1,53 +1,52 @@
+# 필요한 라이브러리를 불러옵니다.
 import cv2
 import numpy as np
+from p5 import *
 import tensorflow as tf
 
-# TensorFlow Lite 모델 파일의 경로를 입력합니다.
-model_path = 'keras_model.h5'
-
-# TensorFlow Lite 모델을 로드합니다.
-interpreter = tf.lite.Interpreter(model_path=model_path)
+# TensorFlow Lite 모델을 불러옵니다.
+interpreter = tf.lite.Interpreter(model_path="quant_model.tflite")
 interpreter.allocate_tensors()
 
-# 입력 및 출력 텐서에 대한 정보를 가져옵니다.
 input_details = interpreter.get_input_details()
 output_details = interpreter.get_output_details()
 
-# 웹캠을 초기화합니다.
-cap = cv2.VideoCapture(0)
+# 웹캠을 불러옵니다.
+camera = cv2.VideoCapture(0)
+camera.set(3, 640)  # width
+camera.set(4, 480)  # height
 
-while True:
-    # 프레임을 읽어옵니다.
-    ret, frame = cap.read()
+# 웹캠에서 이미지를 가져오는 함수입니다.
+def get_image():
+    ret, frame = camera.read()
+    frame = cv2.resize(frame, (224, 224))  # resize
+    frame = np.asarray(frame)  # to numpy array
+    frame = (frame.astype(np.float32) / 127.0) - 1  # normalize
+    frame = np.expand_dims(frame, axis=0)  # expand dimension
+    return frame
 
-    # 프레임 크기를 조정하고 전처리합니다.
+def setup():
+    size(640, 480)
 
-    if not ret:
-        print("Can't receive frame (stream end?). Exiting ...")
-        break
+def draw():
+    background(255)
 
-    # 프레임 크기를 조정하고 전처리합니다.
-    frame_resized = cv2.resize(frame, (224, 224))
-    frame_resized = np.expand_dims(frame_resized, axis=0)
-    frame_resized = frame_resized / 255.0
+    # 이미지 로드
+    image = get_image()
 
-    # TensorFlow Lite 모델로 예측을 수행합니다.
-    interpreter.set_tensor(input_details[0]['index'], frame_resized.astype(np.float32))
+    # 이미지를 모델의 입력 텐서에 설정
+    interpreter.set_tensor(input_details[0]['index'], image)
+    # 모델 실행
     interpreter.invoke()
+    # 예측 결과 도출
     prediction = interpreter.get_tensor(output_details[0]['index'])
 
-    # 화면에 결과를 표시합니다.
-    if(np.argmax(prediction) == 0):
-        cv2.putText(frame, "Masked", (50,50), cv2.FONT_HERSHEY_COMPLEX, 2, (0, 255, 0), 1, cv2.LINE_AA)
-    elif(np.argmax(prediction) == 1):
-        cv2.putText(frame, "No Masked", (50,50), cv2.FONT_HERSHEY_COMPLEX, 2, (0, 0, 255), 1, cv2.LINE_AA)
+    if np.argmax(prediction) == 0:  # 주먹일 경우
+        fill(255, 0, 0)
+        circle((320, 240), 100)  # 원 그림
 
-    cv2.imshow('Mask Monitoring', frame)
+    elif np.argmax(prediction) == 1:  # 보자기일 경우
+        fill(0, 255, 0)
+        rect((260, 190), 120, 100)  # 사각형 그림
 
-    # 'q' 키를 누르면 종료합니다.
-    if cv2.waitKey(1) == ord('q'):
-        break
-
-# 웹캠과 창을 해제합니다.
-cap.release()
-cv2.destroyAllWindows()
+run()
