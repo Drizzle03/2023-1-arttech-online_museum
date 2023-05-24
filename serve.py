@@ -89,16 +89,19 @@ class Circle:
         self.y += dy * self.easing
 
     def display(self):
-        fill(255)
-        circle((self.x, self.y), self.size)
+        stroke(255)
+        strokeWeight(self.size)
+        strokeCap(ROUND)
+        line(self.x, self.y, self.x+0.1, self.y+0.1)
+        # ellipse(self.x, self.y, self.size, self.size)
+
 
 circles = []
-circleCount = 20  # 동그라미 개수 설정
+circleCount = 30  # 동그라미 개수 설정
 status = 1
 
 def setup():
     size(width, height)
-    noStroke()
     for _ in range(circleCount):
         x = random.uniform(0, width)
         y = random.uniform(0, height)
@@ -108,7 +111,7 @@ def setup():
 def draw():
     global circles, status
 
-    fill(0, 10)
+    fill(0, 30)
     rect(0, 0, width, height)
 
     for circle in circles:

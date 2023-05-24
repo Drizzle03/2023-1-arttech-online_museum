@@ -20,15 +20,17 @@ class Circle:
         self.y += dy * self.easing
 
     def display(self):
-        fill(255)
-        circle((self.x, self.y), self.size)
+        stroke(255)
+        strokeWeight(self.size)
+        strokeCap(ROUND)
+        line(self.x, self.y, self.x+1, self.y+1)
+        # circle((self.x, self.y), self.size)
 
 circles = []
 circleCount = 20  # 동그라미 개수 설정
 
 def setup():
     size(width, height)
-    noStroke()
     for _ in range(circleCount):
         x = random.uniform(0, width)
         y = random.uniform(0, height)

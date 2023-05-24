@@ -132,7 +132,7 @@ def draw():
                     circle.targetX = targetX
                     circle.targetY = targetY
 
-        # 보자기 - 퍼짐z
+        # 보자기 - 퍼짐
         elif np.argmax(prediction) == 1:
             if status == 0:
                 status = 1
