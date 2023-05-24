@@ -10,26 +10,27 @@ class Circle:
         self.y = y
         self.targetX = self.x
         self.targetY = self.y
-        self.easing = 0.05
-        self.size = random.uniform(10, 50)  # 동그라미의 크기를 무작위로 설정
+        self.easing = 0.02 #애니메이션 부드러움 조절
+        self.size = random.uniform(10, 50)  
+        # 동그라미 랜덤 크기 설정
 
     def move(self):
         dx = self.targetX - self.x
         dy = self.targetY - self.y
-        self.x += dx * self.easing
+        self.x += dx * self.easing  
         self.y += dy * self.easing
 
     def display(self):
-        stroke(255)
-        strokeWeight(self.size)
-        strokeCap(ROUND)
-        line(self.x, self.y, self.x+1, self.y+1)
-        # circle((self.x, self.y), self.size)
+        fill(255)
+        ellipse(self.x, self.y, self.size, self.size)
+
 
 circles = []
-circleCount = 20  # 동그라미 개수 설정
+circleCount = 30  # 동그라미 개수 설정
+status = 1
 
 def setup():
+    noStroke()
     size(width, height)
     for _ in range(circleCount):
         x = random.uniform(0, width)
@@ -38,6 +39,7 @@ def setup():
         circles.append(circle)
 
 def draw():
+    global circles, status
     fill(0, 10)
     rect(0, 0, width, height)
 
@@ -46,16 +48,21 @@ def draw():
         circle.display()
 
 def key_pressed(event):
-    global circles
+    global circles, status
     if event.key == '1':
-        targetX = width / 2
-        targetY = height / 2
-        for circle in circles:
-            circle.targetX = targetX
-            circle.targetY = targetY
+        if status == 1:
+                status = 0
+                targetX = width / 2
+                targetY = height / 2
+                for circle in circles:
+                    circle.targetX = targetX
+                    circle.targetY = targetY
+
     elif event.key == '2':
-        for circle in circles:
-            circle.targetX = random.uniform(0, width)
-            circle.targetY = random.uniform(0, height)
+        if status == 0:
+                status = 1
+                for circle in circles:
+                    circle.targetX = random.uniform(0, width)
+                    circle.targetY = random.uniform(0, height)
 
 run()

@@ -78,22 +78,19 @@ class Circle:
         self.y = y
         self.targetX = self.x
         self.targetY = self.y
-        self.easing = 0.05
-        self.size = random.uniform(10, 50)
+        self.easing = 0.02 #애니메이션 부드러움 조절
+        self.size = random.uniform(10, 50)  
+        # 동그라미 랜덤 크기 설정
 
     def move(self):
         dx = self.targetX - self.x
         dy = self.targetY - self.y
-        self.x += dx * self.easing
+        self.x += dx * self.easing  
         self.y += dy * self.easing
 
     def display(self):
-        fill(255)  # 채우기 색상을 흰색으로 설정
-        no_stroke()  # 선 없음
-        with push_matrix():
-            translate(self.x, self.y)
-            blur(self.size)  # 테두리를 흐릿하게 만듦
-            ellipse(0, 0, self.size, self.size)
+        fill(255)
+        ellipse(self.x, self.y, self.size, self.size)
 
 
 circles = []
