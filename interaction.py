@@ -1,3 +1,7 @@
+# 캠 없이 인터랙션만 테스트 하고 싶을 떄 실행
+# key 1를 누를 때 - 주먹 효과 대체, 구체가 모임
+# key 2를 누를 때 - 보자기 효과 대체, 구체가 퍼짐
+
 from p5 import *
 import random
 
@@ -49,6 +53,8 @@ def draw():
 
 def key_pressed(event):
     global circles, status
+
+    # 주먹 - 모임
     if event.key == '1':
         if status == 1:
                 status = 0
@@ -58,6 +64,7 @@ def key_pressed(event):
                     circle.targetX = targetX
                     circle.targetY = targetY
 
+    # 보자기 - 퍼짐
     elif event.key == '2':
         if status == 0:
                 status = 1
