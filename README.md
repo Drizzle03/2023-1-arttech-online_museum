@@ -19,3 +19,10 @@ II. 작품명 및 파일 설명
 
 
 03. 미정
+
+
+III. 설치 모듈
+- TensorFlow: pip install tensorflow
+- OpenCV: pip install opencv-python
+- NumPy: pip install numpy
+- p5: pip install p5
