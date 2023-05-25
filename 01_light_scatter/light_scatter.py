@@ -1,3 +1,5 @@
+#Main 파일 - 인공지능 모델 및 인터랙션 적용
+
 import tensorflow as tf
 import cv2
 import numpy as np
@@ -78,7 +80,7 @@ class Circle:
         self.y = y
         self.targetX = self.x
         self.targetY = self.y
-        self.easing = 0.02 #애니메이션 부드러움 조절
+        self.easing = 0.03 #애니메이션 부드러움 조절
         self.size = random.uniform(10, 50)  
         # 동그라미 랜덤 크기 설정
 
@@ -99,6 +101,7 @@ status = 1
 
 def setup():
     size(width, height)
+    noStroke()
     for _ in range(circleCount):
         x = random.uniform(0, width)
         y = random.uniform(0, height)
@@ -107,8 +110,7 @@ def setup():
 
 def draw():
     global circles, status
-
-    fill(0, 30)
+    fill(0, 10)
     rect(0, 0, width, height)
 
     for circle in circles:

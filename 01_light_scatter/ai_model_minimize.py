@@ -1,4 +1,5 @@
 # 티쳐블머신 모델 경량화 파일
+#
 import tensorflow as tf
 
 saved_model_dir = 'keras_model.h5'
