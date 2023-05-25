@@ -10,9 +10,9 @@ I. 프로젝트 동기
 II. 작품명 및 파일 설명
 
 01. 빛의 산란
-- light_scatter.py : Main 파일, model이 적용되어 인터랙션 및 이미지 인식 반영
-- light_scatter_test.py : test 파일, model 적용 없이 인터랙션만 테스트 할 때 사용
-- ai_model_minimize.py : Model 경량화 파일 (양자화 적용)
+- light_scatter.py : Main 파일, model 적용, 인터랙션 및 이미지 인식 반영
+- light_scatter_test.py : test 파일, model 적용 없이 인터랙션만 테스트 할 때만 사용
+- ai_model_minimize.py : Model 경량화 파일 (양자화 적용), 추후 모델 교체시에만 사용
 
 
 02. 미정
