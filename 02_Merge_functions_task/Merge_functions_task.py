@@ -6,6 +6,8 @@ active_buttons = []
 
 smile_img = []
 light_img = []
+circle_image = []
+circle_choice_img = ''
 
 num = 60
 
@@ -33,6 +35,25 @@ def draw():
         light_choice_img = choice(light_img)
         image(light_choice_img, randint(0, 1280), randint(0, 600))  # width와 height를 랜덤 크기로 설정
 
+    #btn3이 활성화 되었을 경우
+    if 2 in active_buttons:
+
+        push_matrix()
+        translate(1280 / 2, 613 / 2)  # 캔버스의 중심점을 회전의 중심점으로 설정합니다
+        rotate(radians(mouse_x))  # 마우스의 x좌표에 따라 red 이미지를 회전시킵니다.
+        image(circle_image[0], -circle_image[0].width/2, -circle_image[0].height/2)
+
+        pop_matrix()
+
+        push_matrix()
+
+        translate(1280 / 2, 613 / 2)  # 캔버스의 중심점을 회전의 중심점으로 설정합니다
+        rotate(radians(mouse_y))  # 마우스의 y좌표에 따라 blue 이미지를 회전시킵니다.
+        image(circle_image[1], -circle_image[1].width/2, -circle_image[1].height/2)
+
+        pop_matrix()
+
+
     #지우개 버튼
     if 5 in active_buttons: 
         frame = True
@@ -43,13 +64,17 @@ def draw():
 
 def draw_button():
     global save_button
+
+    #일반 버튼 status
     for i in range(len(button_images)):
         if i in active_buttons:
             active_image = load_image(f"source/btn/btn{i+1}-active.png")
             image(active_image, 355+(i*99), 627, 75, 75)  
         else:
             image(button_images[i], 355+(i*99), 627, 75, 75)  
+            
 
+    #save 버튼 status
     if save_button == 'deactive':
         image(save_deactive_images, 1175, 628, 75, 75)
     else:
@@ -81,12 +106,18 @@ def load_button_images():
         button_image = load_image(f"source/btn/btn{i+1}-deactive.png")
         button_images.append(button_image)
 
+    #btn3 - circle
+    for i in ['blue', 'red', 'yellow']:
+        circle_image.append(load_image(f"source/btn3_circle/circle-{i}.png"))
 
-    
+
 
 def mouse_pressed():
     global save_button
+    global circle_choice_img
 
+
+    #일반 버튼들 상태 전환
     for i in range(len(button_images)):
         button_x = 355 + (i * 99)
         button_y = 613
@@ -102,6 +133,7 @@ def mouse_pressed():
     save_btn_x = 1175
     save_btn_y = 628
 
+    #save 버튼 상태 전환
     if save_btn_x <= mouse_x <= save_btn_x + button_width and save_btn_y <= mouse_y <= save_btn_y + button_height:
         if save_button == 'deactive':
             save_button = 'active'
