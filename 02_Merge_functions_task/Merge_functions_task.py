@@ -69,7 +69,11 @@ def draw():
         stroke(0)
         stroke_weight(5)
         for i in range(len(path) - 1):
-            line(path[i].x, path[i].y, path[i+1].x, path[i+1].y)
+            try:
+                line(path[i].x, path[i].y, path[i+1].x, path[i+1].y)
+            except ZeroDivisionError:
+                # 0으로 나누기 예외 처리 코드 작성
+                print("ZeroDivisionError occurred. Please make sure the width and height are non-zero.")
 
 def draw_button():
     global save_button
