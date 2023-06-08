@@ -3,22 +3,55 @@ from p5 import *
 button_images = []  
 active_buttons = []  
 
-mx = [0]*60  # 마우스의 x좌표를 저장할 리스트
-my = [0]*60  # 마우스의 y좌표를 저장할 리스트
 num = 60
 
 save_deactive_images = ''
 save_button = 'deactive'
 frame = True
 
+# 색상 리스트
+color_list = ["#F2EEE5", "#E5C1C5", "#C3E2DD", "#6ECEDA"]
+color_index = 0
+
+class Spin:
+    def __init__(self, xpos, ypos, s):
+        self.x = xpos
+        self.y = ypos
+        self.speed = s
+        self.angle = 0.0
+
+    def update(self):
+        self.angle += self.speed
+
+
+class SpinSpots(Spin):
+    def __init__(self, x, y, s, d):
+        super().__init__(x, y, s)
+        self.dim = d
+
+    def display(self):
+        no_stroke()
+        push_matrix()
+        translate(mouse_x, mouse_y)  # 변경된 부분
+        self.angle += self.speed
+        rotate(self.angle)
+        ellipse(-self.dim/2, 0, self.dim, self.dim)
+        ellipse(self.dim/2, 0, self.dim, self.dim)
+        pop_matrix()
+
+
+spots = None
+arm = None
+
 def setup():
+    global spots, arm
     size(1280, 720)  
     no_stroke()
     load_button_images()
+    spots = SpinSpots(width/2, height/2, -0.02, 90.0)
 
 def draw():
-    global save_button, frame
-
+    global save_button, frame, spots, arm, color_list, color_index
     if frame:
         background(255)
         frame = False
@@ -26,14 +59,27 @@ def draw():
     fill("#E6E6E6")
     rect(0, 613, 1280, 108)
 
-    if 1 in active_buttons:  # btn2가 활성화되었을 경우
-        which = frame_count % num
-        mx[which] = mouse_x
-        my[which] = min(613, mouse_y)  # 마우스의 y 좌표가 613 이상이면 613으로 고정
+    # btn1가 활성화되었을 경우
+    if 0 in active_buttons:
+        fill(color_list[color_index])
+        spots.update()
+        spots.display()
 
-        for i in range(num):
-            index = (which + 1 + i) % num
-            ellipse(mx[index], my[index], i, i)
+    # btn2가 활성화되었을 경우
+    if 1 in active_buttons: 
+        which = frame_count % num
+        mousey = min(600, mouse_y)  # 마우스의 y 좌표가 613 이상이면 613으로 고정
+
+        fill(color_list[color_index])
+        ellipse(mouse_x, mousey, 30, 30)
+            
+    # 색상 인덱스 갱신
+    color_index = (color_index + 1) % len(color_list)
+
+
+
+    if 5 in active_buttons: 
+        frame = True
 
     draw_button()
 
