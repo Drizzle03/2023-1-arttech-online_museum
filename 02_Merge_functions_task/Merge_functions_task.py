@@ -9,8 +9,10 @@ light_img = []
 circle_image = []
 circle_choice_img = ''
 
-save_deactive_images = ''
+save_deactive_images = None
 save_button = 'deactive'
+
+error_images = None
 
 frame = True
 smile_active = False
@@ -55,7 +57,12 @@ def draw():
         rotate(radians(mouse_y))  # 마우스의 y좌표에 따라 blue 이미지를 회전시킵니다.
         image(circle_image[1], -circle_image[1].width/2, -circle_image[1].height/2)
         pop_matrix()
+        
 
+    # 에러 버튼
+    if 4 in active_buttons:
+        image(error_images, 0, 0, 1280, 613)
+        active_buttons.remove(4)
 
     # 지우개 버튼
     if 5 in active_buttons:
@@ -95,7 +102,7 @@ def draw_button():
         image(save_active_image, 1175, 628, 75, 75)
 
 def load_button_images():
-    global save_deactive_images
+    global save_deactive_images, error_images
     save_deactive_images = load_image('source/btn/save-deactive.png')
 
     # btn1 - red image
@@ -116,6 +123,8 @@ def load_button_images():
     # btn3 - circle
     for i in ['blue', 'red', 'yellow']:
         circle_image.append(load_image(f"source/btn3_circle/circle-{i}.png"))
+
+    error_images = load_image("source/btn5_error/error.png")
 
 
 def mouse_pressed():
