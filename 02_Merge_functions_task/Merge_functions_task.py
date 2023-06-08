@@ -33,10 +33,13 @@ def draw():
     # btn1가 활성화되었을 경우
     if 0 in active_buttons:
         light_choice_img = choice(light_img)
-        image(light_choice_img, randint(0, 1280), randint(0, 600))  # width와 height를 랜덤 크기로 설정
+        image(light_choice_img, randint(0, 1280), randint(0, 500))
 
     #btn3이 활성화 되었을 경우
     if 2 in active_buttons:
+
+        fill(255)
+        circle(1280/2, 613/2, 500)
 
         push_matrix()
         translate(1280 / 2, 613 / 2)  # 캔버스의 중심점을 회전의 중심점으로 설정합니다
@@ -50,7 +53,6 @@ def draw():
         translate(1280 / 2, 613 / 2)  # 캔버스의 중심점을 회전의 중심점으로 설정합니다
         rotate(radians(mouse_y))  # 마우스의 y좌표에 따라 blue 이미지를 회전시킵니다.
         image(circle_image[1], -circle_image[1].width/2, -circle_image[1].height/2)
-
         pop_matrix()
 
 
