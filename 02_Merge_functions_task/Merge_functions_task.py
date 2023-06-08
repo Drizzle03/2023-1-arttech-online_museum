@@ -9,11 +9,11 @@ light_img = []
 circle_image = []
 circle_choice_img = ''
 
-num = 60
-
 save_deactive_images = ''
 save_button = 'deactive'
+
 frame = True
+smile_active = False
 
 
 def setup():
@@ -33,7 +33,7 @@ def draw():
     # btn1가 활성화되었을 경우
     if 0 in active_buttons:
         light_choice_img = choice(light_img)
-        image(light_choice_img, randint(0, 1280), randint(0, 500))
+        image(light_choice_img, randint(0, 1280)-100, randint(0, 300)-100, 500, 500)
 
     #btn3이 활성화 되었을 경우
     if 2 in active_buttons:
@@ -87,22 +87,17 @@ def load_button_images():
     global save_deactive_images
     save_deactive_images = load_image('source/btn/save-deactive.png')
     
-
     #btn1 - red image
     for i in range(4):
         light_img.append(load_image(f'source/btn1_light/light-red-{100 + (i*50)}.png'))
-
-    #btn1 - yellow image
-    for i in range(4):
         light_img.append(load_image(f'source/btn1_light/light-yellow-{100 + (i*50)}.png'))
-
-    #btn1 - blue image
-    for i in range(4):
         light_img.append(load_image(f'source/btn1_light/light-blue-{100 + (i*50)}.png'))
 
     #btn2 - smile image
-    for i in range(4):
-        smile_img.append(load_image(f'source/btn2_smile/smile{50*(i+1)}.png'))
+    for i in range(3):
+        #smile_img.append(load_image(f'source/btn2_smile/smile-b-{50*(i+1)}.png'))
+        smile_img.append(load_image(f'source/btn2_smile/smile-r-{50*(i+2)}.png'))
+        smile_img.append(load_image(f'source/btn2_smile/smile-y-{50*(i+2)}.png'))
 
     for i in range(6):
         button_image = load_image(f"source/btn/btn{i+1}-deactive.png")
@@ -116,8 +111,7 @@ def load_button_images():
 
 def mouse_pressed():
     global save_button
-    global circle_choice_img
-
+    global circle_choice_img, smile_active
 
     #일반 버튼들 상태 전환
     for i in range(len(button_images)):
@@ -129,23 +123,40 @@ def mouse_pressed():
         if button_x <= mouse_x <= button_x + button_width and button_y <= mouse_y <= button_y + button_height:
             if i in active_buttons:
                 active_buttons.remove(i)
+                if i == 1:
+                    smile_active = False
             else:
                 active_buttons.append(i)
 
     save_btn_x = 1175
     save_btn_y = 628
 
+
     #save 버튼 상태 전환
     if save_btn_x <= mouse_x <= save_btn_x + button_width and save_btn_y <= mouse_y <= save_btn_y + button_height:
         if save_button == 'deactive':
             save_button = 'active'
+            save_frame("output.png")  # 현재 프레임을 "output.png"로 저장
+            save_button = 'deactive'
         else:
             save_button = 'deactive'
 
-    if 1 in active_buttons: 
-        mousey = min(600, mouse_y)  # 마우스의 y 좌표가 613 이상이면 613으로 고정
+    # 스마일 버튼 생성
+    if 1 in active_buttons:
+        if smile_active: 
+            mousey = min(600, mouse_y)  # 마우스의 y 좌표가 613 이상이면 613으로 고정
 
-        choice_smile_img = choice(smile_img)  # 50에서 200 사이의 랜덤 크기 스마일 이미지 선택 
-        image(choice_smile_img, mouse_x, mousey)  # width와 height를 랜덤 크기로 설정
+            choice_smile_img = choice(smile_img)  # 50에서 200 사이의 랜덤 크기 스마일 이미지 선택 
+
+            push_matrix()  # 현재 변환행렬 저장
+
+            translate(mouse_x, mousey)  # 이미지를 그릴 위치로 이동
+            rotate(radians(randint(-70, 70)))  # 랜덤한 각도로 회전
+            image(choice_smile_img, -choice_smile_img.width / 2, -choice_smile_img.height / 2)  # 이미지의 중심이 (0, 0)에 위치하도록 이미지 그리기
+
+            pop_matrix()  # 이전 변환행렬 복원
+        else:
+            smile_active = True
+
 
 run()

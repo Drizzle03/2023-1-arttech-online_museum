@@ -1,40 +1,44 @@
 from p5 import *
 
-previous_mouse_x = 0
+xvals = []
+yvals = []
+bvals = []
 
 def setup():
-    size(800, 800)
+    size(640, 360)
+    for _ in range(width):
+        xvals.append(0)
+        yvals.append(0)
+        bvals.append(0)
 
 def draw():
-    global previous_mouse_x
+    background(102)
+  
+    for i in range(1, width):
+        xvals[i-1] = xvals[i]
+        yvals[i-1] = yvals[i]
+        bvals[i-1] = bvals[i]
+  
+    xvals[width-1] = mouse_x
+    yvals[width-1] = mouse_y
+  
+    if mouse_is_pressed:
+        bvals[width-1] = 0
+    else:
+        bvals[width-1] = height/3
 
-    if abs(mouse_x - previous_mouse_x) > 1:
-        background(255)  # background는 draw 함수 내에서 호출되어야 합니다.
-        create_and_draw_shape()
-        previous_mouse_x = mouse_x
+    fill(255)
+    no_stroke()
+    rect((0, height/3), width, height/3+1)
 
-def create_and_draw_shape():
-    translate(width/2, height/2)
-
-    start_angle = map_value(mouse_x, 0, width, 0, 360)
-    num_lines = 720
-
-    for angle in range(num_lines):
-        adjusted_angle = (angle + start_angle) % num_lines
-        r = map_value(adjusted_angle, 0, num_lines - 1, 255, 105)
-        stroke(r, 105, 180)
-        stroke_weight(3)
-
-        x = cos(radians(adjusted_angle)) * (width/4)
-        y = sin(radians(adjusted_angle)) * (width/4)
-
-        line(0, 0, x, y)
-
-def map_value(value, leftMin, leftMax, rightMin, rightMax):
-    leftSpan = leftMax - leftMin
-    rightSpan = rightMax - rightMin
-
-    valueScaled = float(value - leftMin) / float(leftSpan)
-    return rightMin + (valueScaled * rightSpan)
+    for i in range(1, width):
+        stroke(255)
+        point((i, map(xvals[i], 0, width, 0, height/3-1)))
+    
+        stroke(0)
+        point((i, height/3+yvals[i]/3))
+    
+        stroke(255)
+        line((i, (2*height/3) + bvals[i]), (i, (2*height/3) + bvals[i-1]))
 
 run()
